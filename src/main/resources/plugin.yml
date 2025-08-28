@@ -1,8 +1,4 @@
-name: TemplatePlugin
+name: InfinitePlayers
+main: com.infiniteplayers.InfinitePlayers
 version: 1.0
-api-version: 1.13
-main: de.joeakeem.spigotmc.plugin.template.TemplatePlugin
-
-commands:
-  enrich:
-    description: Makes you rich!
+api-version: 1.16
