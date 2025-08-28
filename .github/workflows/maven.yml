@@ -21,4 +21,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
        name: artifact
-       path: /home/runner/work/infiniteplayers/infiniteplayers/target/infiniteplayers-0.1-SNAPSHOT.jar
+       path: /home/runner/work/infiniteplayers/infiniteplayers/target/InfinitePlayers-0.1-SNAPSHOT.jar
