@@ -1,4 +1,4 @@
 name: InfinitePlayers
-main: com.InfinitePlayers
-version: 1.0
+main: com.infiniteplayers.InfinitePlayers
+version: 0.1-SNAPSHOT
 api-version: 1.16
