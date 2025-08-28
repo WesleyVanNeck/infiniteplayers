@@ -1,4 +1,4 @@
-package com.infiniteplayers.infiniteplayers;
+package com.wesleyvanneck.infiniteplayers.infiniteplayers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
