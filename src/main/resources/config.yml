@@ -1,0 +1,48 @@
+display:
+  mode: dynamic
+  extra-slots: 100
+  fixed-max: 9999
+
+soft-cap:
+  enabled: false
+  limit: 150
+  message: "&cThe server is busy. Try again soon. (&7Soft cap {limit}&c)"
+
+rate-limit:
+  enabled: false
+  joins: 10
+  per-seconds: 30
+  message: "&cJoin burst detected. Try again shortly. (&7{joins}/{seconds}&c)"
+
+tps-gate:
+  enabled: true
+  min-tps: 18.5
+  use-5m-window: false
+  message: "&cServer TPS is low ({tps}). Please try again soon. (&7Min {minTps}&c)"
+
+queue:
+  enabled: true
+  max-size: 500
+  message: "&eQueue position: &6#{pos}&e/&6{size}&e. &7Tier: {tier}."
+  tiers:
+    - "infiniteplayers.tier.vip"
+    - "infiniteplayers.tier.plus"
+
+  # NEW: per-tier overrides (keys are permission nodes above, or "default")
+  tier-settings:
+    infiniteplayers.tier.vip:
+      soft-cap: 300                # this tier queues after 300 online (overrides global)
+      rate:
+        joins: 20                  # allow 20 joins per 30s for VIP
+        per-seconds: 30
+        message: "&6VIP gate: Join flow limited. (&7{joins}/{seconds}&6)"
+    infiniteplayers.tier.plus:
+      soft-cap: 220
+      rate:
+        joins: 12
+        per-seconds: 30
+    default:
+      soft-cap: off                # inherit global (or turn off override)
+      rate:
+        joins: 6                   # baseline stricter rate
+        per-seconds: 30

@@ -1,4 +1,24 @@
 name: InfinitePlayers
 main: com.wesleyvanneck.infiniteplayers.InfinitePlayers
-version: 0.1-SNAPSHOT
-api-version: 1.16
+version: 0.2-SNAPSHOT
+api-version: '1.16'
+
+commands:
+  infiniteplayers:
+    description: Manage InfinitePlayers
+    usage: /<command> reload|status|tiers|queue [list|clear|remove <player>] | set <...>
+    permission: infiniteplayers.reload
+    permission-message: You don't have permission to do that.
+
+permissions:
+  infiniteplayers.reload:
+    description: Manage InfinitePlayers
+    default: op
+  infiniteplayers.bypass:
+    description: Bypass all gates and queue
+    default: op
+
+  infiniteplayers.tier.vip:
+    default: false
+  infiniteplayers.tier.plus:
+    default: false
