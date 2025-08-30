@@ -272,7 +272,7 @@ public class InfinitePlayers extends JavaPlugin implements Listener, CommandExec
         while (tierQueues.size() < need) tierQueues.add(new ConcurrentLinkedDeque<>());
         while (tierRecentJoins.size() < need) tierRecentJoins.add(new ArrayDeque<>());
         while (tierSoftCaps.size() < need) tierSoftCaps.add(null);
-        while (tierRates.size() < need) tierRates.add(null);
+        while (tierRates.size() < need) tierRates.add(null); //tps
     }
 
     private int positionInQueue(UUID id, int tier) {
@@ -318,18 +318,42 @@ public class InfinitePlayers extends JavaPlugin implements Listener, CommandExec
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
-    private double readTps(int index) {
-        try { double[] tps = Bukkit.getServer().getTPS(); if (tps!=null && index<tps.length) return clamp(tps[index]); } catch (Throwable ignored) {}
+// Spigot-safe TPS reader (works on Paper too)
+   private double readTps(int index) {
+    try {
+        Object server = Bukkit.getServer();
+
+        // Try Paper: public double[] Server#getTPS()
         try {
-            Object craftServer = Bukkit.getServer();
-            Field console = craftServer.getClass().getDeclaredField("console"); console.setAccessible(true);
-            Object ms = console.get(craftServer);
-            Field f = ms.getClass().getDeclaredField("recentTps"); f.setAccessible(true);
-            double[] arr = (double[]) f.get(ms); if (arr!=null && index<arr.length) return clamp(arr[index]);
-        } catch (Throwable ignored) {}
-        return -1.0;
+            java.lang.reflect.Method m = server.getClass().getMethod("getTPS");
+            Object res = m.invoke(server);
+            if (res instanceof double[]) {
+                double[] tps = (double[]) res;
+                if (index >= 0 && index < tps.length) return clampTps(tps[index]);
+            }
+        } catch (NoSuchMethodException ignored) {
+            // Not Paper, fall through to CraftBukkit internals
+        }
+
+        // Fallback: CraftBukkit/Mojang server 'recentTps' field
+        try {
+            java.lang.reflect.Field consoleField = server.getClass().getDeclaredField("console");
+            consoleField.setAccessible(true);
+            Object mcServer = consoleField.get(server);
+
+            java.lang.reflect.Field recentTps = mcServer.getClass().getDeclaredField("recentTps");
+            recentTps.setAccessible(true);
+            double[] arr = (double[]) recentTps.get(mcServer);
+            if (arr != null && index >= 0 && index < arr.length) return clampTps(arr[index]);
+        } catch (NoSuchFieldException ignored) {
+            // Not CraftBukkit with that field
+        }
+    } catch (Throwable ignored) {
     }
-    private double clamp(double v){ return Math.max(0.0, Math.min(20.0, v)); }
+    return -1.0; // unknown / unavailable
+}
+
+   private double clampTps(double v) { return Math.max(0.0, Math.min(20.0, v)); }
 
     // ===== Commands
 
@@ -422,7 +446,11 @@ public class InfinitePlayers extends JavaPlugin implements Listener, CommandExec
         s.sendMessage(ChatColor.YELLOW+"Usage: /"+label+" reload|status|tiers|queue [list|clear|remove <player>] | set <...>");
         return true;
     }
-
+	
+	private void err(org.bukkit.command.CommandSender s, String expected) {
+    s.sendMessage(org.bukkit.ChatColor.RED + "Invalid value. Expected " + expected);
+    }
+	
     private boolean legacySet(CommandSender s, String label, String key, String val) {
         // Reuse existing setters from previous versions: keep this compact
         switch (key) {
