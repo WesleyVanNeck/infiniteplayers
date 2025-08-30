@@ -1,4 +1,4 @@
-package com.example.infiniteplayers;
+package com.wesleyvanneck.infiniteplayers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
