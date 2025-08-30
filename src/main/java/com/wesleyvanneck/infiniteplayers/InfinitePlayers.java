@@ -1,4 +1,4 @@
-package com.wesleyvanneck.infiniteplayers;
+package com.example.infiniteplayers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque; #readTps
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
 public class InfinitePlayers extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
@@ -168,43 +168,7 @@ public class InfinitePlayers extends JavaPlugin implements Listener, CommandExec
 
         // TPS
         if (tpsGateEnabled) {
-// Spigot-safe TPS reader (works on Paper too) err
-  private double readTps(int index) {
-    try {
-        Object server = Bukkit.getServer();
-
-        // Try Paper: public double[] Server#getTPS()
-        try {
-            java.lang.reflect.Method m = server.getClass().getMethod("getTPS");
-            Object res = m.invoke(server);
-            if (res instanceof double[]) {
-                double[] tps = (double[]) res;
-                if (index >= 0 && index < tps.length) return clampTps(tps[index]);
-            }
-        } catch (NoSuchMethodException ignored) {
-            // Not Paper, fall through to CraftBukkit internals
-        }
-
-        // Fallback: CraftBukkit/Mojang server 'recentTps' field
-        try {
-            java.lang.reflect.Field consoleField = server.getClass().getDeclaredField("console");
-            consoleField.setAccessible(true);
-            Object mcServer = consoleField.get(server);
-
-            java.lang.reflect.Field recentTps = mcServer.getClass().getDeclaredField("recentTps");
-            recentTps.setAccessible(true);
-            double[] arr = (double[]) recentTps.get(mcServer);
-            if (arr != null && index >= 0 && index < arr.length) return clampTps(arr[index]);
-        } catch (NoSuchFieldException ignored) {
-            // Not CraftBukkit with that field
-        }
-    } catch (Throwable ignored) {
-    }
-    return -1.0; // unknown / unavailable
-}
-
-private double clampTps(double v) { return Math.max(0.0, Math.min(20.0, v)); }
-
+            double tps = readTps(tpsUse5m ? 1 : 0);
             if (tps > 0 && tps < tpsMin) {
                 mustQueue = true;
                 reasonMsg = format(tpsMessage, online).replace("{tps}", String.format("%.2f", tps))
